@@ -48,7 +48,7 @@ const Posts = () => {
     <Layout>
       <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
         <h1 style={{ color: '#8B0000', textAlign: 'center', marginBottom: '2rem' }}>
-          {pageContent?.title || '📝 Posts'}
+          {pageContent?.title || '📝 Community Posts'}
         </h1>
         
         {pageContent?.content && (
@@ -115,7 +115,7 @@ const Posts = () => {
           }}>
             <h3 style={{ color: '#8B0000', marginBottom: '1rem' }}>No posts available</h3>
             <p style={{ color: '#666' }}>
-              Configure YouTube API to fetch posts from the channel.
+              Configure YouTube API to fetch community posts from the channel.
             </p>
           </div>
         )}

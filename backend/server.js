@@ -681,175 +681,65 @@ app.get('/api/video-stats', async (req, res) => {
   }
 });
 
-// Find correct channel ID
-app.get('/api/find-channel', async (req, res) => {
-  try {
-    const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
-      params: {
-        key: YOUTUBE_API_KEY,
-        q: 'அன்பு தானே எல்லாம் சேது',
-        type: 'channel',
-        part: 'snippet',
-        maxResults: 5
-      }
-    });
-    res.json({ 
-      success: true, 
-      channels: response.data.items.map(item => ({
-        channelId: item.snippet.channelId,
-        title: item.snippet.title,
-        description: item.snippet.description
-      }))
-    });
-  } catch (error) {
-    res.json({ 
-      success: false, 
-      error: error.response?.data || error.message 
-    });
-  }
-});
-
-// Test YouTube API
-app.get('/api/test-youtube', async (req, res) => {
-  try {
-    const response = await axios.get(`https://www.googleapis.com/youtube/v3/channels`, {
-      params: {
-        key: YOUTUBE_API_KEY,
-        id: 'UCanbuthaneellam5527',
-        part: 'snippet,statistics'
-      }
-    });
-    res.json({ 
-      success: true, 
-      itemsCount: response.data.items?.length || 0,
-      data: response.data 
-    });
-  } catch (error) {
-    res.json({ 
-      success: false, 
-      error: error.response?.data || error.message,
-      status: error.response?.status 
-    });
-  }
-});
-
 // Get posts (YouTube community posts)
 app.get('/api/posts', async (req, res) => {
   try {
-    const channelId = CHANNEL_ID || 'UCzNKKFxPS0sW2bKkuSt9VLA';
-    const apiKey = YOUTUBE_API_KEY;
-    
-    if (!apiKey || apiKey === 'your_youtube_api_key_here') {
-      return res.json({ posts: [], message: 'YouTube API key not configured' });
+    if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === 'your_youtube_api_key_here' || !CHANNEL_ID || CHANNEL_ID === 'your_channel_id_here') {
+      return res.json({ posts: [] });
     }
 
     let posts = [];
     
     try {
-      // Method 1: Try activities endpoint with all activity types
+      // Try activities endpoint first
       const activitiesResponse = await axios.get(`https://www.googleapis.com/youtube/v3/activities`, {
         params: {
-          key: apiKey,
-          channelId: channelId,
+          key: YOUTUBE_API_KEY,
+          channelId: CHANNEL_ID,
           part: 'snippet,contentDetails',
-          maxResults: 50
+          maxResults: 20
         }
       });
 
-      console.log('Activities response items:', activitiesResponse.data.items?.length || 0);
+      const activityPosts = activitiesResponse.data.items
+        .filter(item => item.snippet.type === 'bulletin')
+        .map(item => ({
+          id: item.id,
+          content: item.snippet.description || item.snippet.title,
+          publishedAt: item.snippet.publishedAt,
+          author: item.snippet.channelTitle,
+          timeAgo: getTimeAgo(item.snippet.publishedAt)
+        }));
       
-      if (activitiesResponse.data.items) {
-        activitiesResponse.data.items.forEach(item => {
-          console.log('Activity type:', item.snippet?.type, 'Title:', item.snippet?.title);
-        });
-        
-        // Try all activity types that might contain posts
-        const activityPosts = activitiesResponse.data.items
-          .filter(item => {
-            const type = item.snippet?.type;
-            return type === 'bulletin' || type === 'social' || type === 'channelItem' || type === 'upload';
-          })
-          .map(item => ({
-            id: item.id,
-            content: item.snippet.description || item.snippet.title || ' post',
-            publishedAt: item.snippet.publishedAt,
-            author: item.snippet.channelTitle || 'Anbu Thaane Ellam Sethu',
-            timeAgo: getTimeAgo(item.snippet.publishedAt),
-            type: item.snippet.type
-          }));
-        
-        posts = activityPosts;
-        console.log('Found', posts.length, 'activity posts');
-      }
-      
+      posts = posts.concat(activityPosts);
     } catch (actError) {
-      console.log('Activities API error:', actError.response?.data || actError.message);
+      console.log('Activities API failed:', actError.message);
     }
-    
-    // Method 2: Try using the channel's RSS feed approach
+
+    // If no posts from activities, create sample posts as fallback
     if (posts.length === 0) {
-      try {
-        // Get channel info to find RSS or other endpoints
-        const channelResponse = await axios.get(`https://www.googleapis.com/youtube/v3/channels`, {
-          params: {
-            key: apiKey,
-            id: channelId,
-            part: 'snippet,contentDetails,statistics'
-          }
-        });
-        
-        console.log('Channel info:', channelResponse.data.items?.[0]?.snippet?.title);
-        
-        // Try to get recent uploads and check descriptions for post-like content
-        const uploadsPlaylistId = channelResponse.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-        
-        if (uploadsPlaylistId) {
-          const playlistResponse = await axios.get(`https://www.googleapis.com/youtube/v3/playlistItems`, {
-            params: {
-              key: apiKey,
-              playlistId: uploadsPlaylistId,
-              part: 'snippet',
-              maxResults: 10
-            }
-          });
-          
-          // Check if any recent videos have post-like descriptions
-          const recentPosts = playlistResponse.data.items
-            ?.filter(item => {
-              const desc = item.snippet?.description || '';
-              const title = item.snippet?.title || '';
-              // Look for post-like patterns
-              return desc.includes('Full video link') || title.length < 100;
-            })
-            .map(item => ({
-              id: `post_${item.snippet.resourceId.videoId}`,
-              content: item.snippet.description || item.snippet.title,
-              publishedAt: item.snippet.publishedAt,
-              author: item.snippet.channelTitle || 'Anbu Thaane Ellam Sethu',
-              timeAgo: getTimeAgo(item.snippet.publishedAt),
-              type: 'video_post'
-            })) || [];
-          
-          posts = posts.concat(recentPosts);
-          console.log('Found', recentPosts.length, 'video-based posts');
+      posts = [
+        {
+          id: 'sample_post_1',
+          content: 'Welcome to our Tamil devotional channel! 🙏 Share your spiritual experiences with us.',
+          publishedAt: new Date().toISOString(),
+          author: 'Anbu Thaane Ellam Sethu',
+          timeAgo: 'Today'
+        },
+        {
+          id: 'sample_post_2', 
+          content: 'New devotional video coming soon! Stay tuned for beautiful Tamil spiritual content.',
+          publishedAt: new Date(Date.now() - 86400000).toISOString(),
+          author: 'Anbu Thaane Ellam Sethu',
+          timeAgo: '1 day ago'
         }
-        
-      } catch (channelError) {
-        console.log('Channel API error:', channelError.message);
-      }
+      ];
     }
     
-    res.json({ 
-      posts, 
-      message: posts.length === 0 ? 'No posts found. YouTube Posts are not accessible via API.' : `Found ${posts.length} posts`,
-      debug: {
-        channelId: channelId,
-        apiConfigured: !!apiKey
-      }
-    });
+    res.json({ posts });
   } catch (error) {
     console.error('Error fetching posts:', error.message);
-    res.json({ posts: [], error: error.message });
+    res.json({ posts: [] });
   }
 });
 
@@ -1007,107 +897,12 @@ app.put('/api/admin/pages/:type', authenticate, requireAdmin, async (req, res) =
 // Public page content routes
 app.get('/api/pages/:type', async (req, res) => {
   try {
-    // Return static content without database dependency
-    const defaultContent = {
-      about: { 
-        title: 'About Anbu Thaane Ellam Sethu', 
-        content: 'Welcome to our Tamil devotional channel. We share spiritual content, cultural values, and devotional songs to spread love and peace.',
-        metadata: {} 
-      },
-      contact: { 
-        title: 'Contact Us', 
-        content: 'Get in touch with us for any queries or spiritual guidance.',
-        metadata: {
-          email: 'contact@anbuthaane.com',
-          phone: '+91 93427 32720',
-          location: 'Tamil Nadu, India'
-        }
-      },
-      posts: { 
-        title: ' Posts', 
-        content: 'Stay updated with our latest posts and announcements.',
-        metadata: {} 
-      }
-    };
-    
-    const pageContent = defaultContent[req.params.type];
-    if (!pageContent) {
-      return res.status(404).json({ error: 'Page not found' });
-    }
-    
-    res.json(pageContent);
-  } catch (error) {
-    console.error('Error fetching page:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Test route
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend server is running!', timestamp: new Date().toISOString() });
-});
-
-// Seed sample pages
-app.post('/api/seed-pages', async (req, res) => {
-  try {
-    const samplePages = [
-      {
-        type: 'about',
-        title: 'About Anbu Thaane Ellam Sethu',
-        content: 'Welcome to our Tamil devotional channel. We share spiritual content, cultural values, and devotional songs to spread love and peace.',
-        metadata: {}
-      },
-      {
-        type: 'contact',
-        title: 'Contact Us',
-        content: 'Get in touch with us for any queries or spiritual guidance.',
-        metadata: {
-          email: 'contact@anbuthaane.com',
-          phone: '+91 93427 32720',
-          location: 'Tamil Nadu, India'
-        }
-      },
-      {
-        type: 'posts',
-        title: 'Posts',
-        content: 'Stay updated with our latest posts and announcements.',
-        metadata: {}
-      }
-    ];
-
-    for (const pageData of samplePages) {
-      await Page.findOneAndUpdate(
-        { type: pageData.type },
-        pageData,
-        { upsert: true, new: true }
-      );
-    }
-
-    res.json({ message: `Seeded ${samplePages.length} sample pages` });
+    const page = await Page.findOne({ type: req.params.type });
+    res.json(page);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-
-// Auto-seed on startup
-setTimeout(async () => {
-  try {
-    const existingPages = await Page.countDocuments();
-    if (existingPages === 0) {
-      const samplePages = [
-        { type: 'about', title: 'About Anbu Thaane Ellam Sethu', content: 'Welcome to our Tamil devotional channel.', metadata: {} },
-        { type: 'contact', title: 'Contact Us', content: 'Get in touch with us.', metadata: { email: 'contact@anbuthaane.com', phone: '+91 93427 32720' } },
-        { type: 'posts', title: ' Posts', content: 'Latest updates and announcements.', metadata: {} }
-      ];
-      for (const pageData of samplePages) {
-        await Page.findOneAndUpdate({ type: pageData.type }, pageData, { upsert: true, new: true });
-      }
-      console.log('Auto-seeded sample pages');
-    }
-  } catch (error) {
-    console.error('Auto-seed error:', error);
-  }
-}, 5000);
 
 // Contact form submission
 app.post('/api/contact', async (req, res) => {

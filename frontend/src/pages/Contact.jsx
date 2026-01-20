@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { API_BASE_URL } from '../config/api';
 import Layout from '../components/Layout';
 import { 
   HeroContainer, GlassCard, ModernTitle, 
@@ -27,7 +26,8 @@ const Contact = () => {
 
   const fetchPageContent = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/pages/contact`);
+      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const response = await axios.get(`${baseURL}/pages/contact`);
       setPageContent(response.data);
     } catch (error) {
       console.error('Error fetching page content:', error);
@@ -48,7 +48,8 @@ const Contact = () => {
     setSubmitting(true);
 
     try {
-      await axios.post(`${API_BASE_URL}/contact`, formData);
+      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      await axios.post(`${baseURL}/contact`, formData);
       toast.success(t('thank_you') || 'Message sent successfully!');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {

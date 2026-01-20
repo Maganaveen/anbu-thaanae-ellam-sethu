@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { API_BASE_URL } from '../config/api';
 import Layout from '../components/Layout';
 import VideoCard from '../components/VideoCard';
 import { Container, Section, SectionTitle, VideoGrid } from '../styles/styled';
@@ -19,7 +18,8 @@ const Live = () => {
 
   const fetchLiveVideos = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/videos?type=live&page=${page}&limit=24`);
+      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const response = await axios.get(`${baseURL}/videos?type=live&page=${page}&limit=24`);
       
       setLiveVideos(response.data.videos || []);
       setTotalPages(response.data.totalPages || 1);
