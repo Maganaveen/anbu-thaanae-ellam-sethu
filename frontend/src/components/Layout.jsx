@@ -30,6 +30,10 @@ const Layout = ({ children }) => {
     }
   }, []);
 
+  useEffect(() => {
+    console.log('mobileMenuOpen state changed to:', mobileMenuOpen);
+  }, [mobileMenuOpen]);
+
   const toggleLanguage = () => {
     const newLang = i18n.language === 'ta' ? 'en' : 'ta';
     i18n.changeLanguage(newLang);
@@ -76,28 +80,49 @@ const Layout = ({ children }) => {
             <LanguageToggle onClick={toggleLanguage}>
               {i18n.language === 'ta' ? 'English' : 'தமிழ்'}
             </LanguageToggle>
-            <MobileToggle onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <MobileToggle onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setMobileMenuOpen(!mobileMenuOpen);
+            }}>
               ☰
             </MobileToggle>
           </div>
-          
-          <MobileMenu isOpen={mobileMenuOpen}>
-            <NavLink as={Link} to="/" end onClick={() => setMobileMenuOpen(false)}>{t('home')}</NavLink>
-            <NavLink as={Link} to="/admin-videos" onClick={() => setMobileMenuOpen(false)}>{t('videos')}</NavLink>
-            <NavLink as={Link} to="/about" onClick={() => setMobileMenuOpen(false)}>{t('about')}</NavLink>
-            <NavLink as={Link} to="/contact" onClick={() => setMobileMenuOpen(false)}>{t('contact')}</NavLink>
-            <DonateNavLink as={Link} to="/donate" onClick={() => setMobileMenuOpen(false)}>{t('donate')}</DonateNavLink>
-            {user?.role === 'admin' && (
-              <NavLink as={Link} to="/admin/pages" onClick={() => setMobileMenuOpen(false)}>📝 Manage Pages</NavLink>
-            )}
-            {user ? (
-              <NavLink onClick={() => { handleLogout(); setMobileMenuOpen(false); }} style={{ cursor: 'pointer' }}>{t('logout')}</NavLink>
-            ) : (
-              <NavLink onClick={() => { setShowLogin(true); setMobileMenuOpen(false); }} style={{ cursor: 'pointer' }}>{t('login')}</NavLink>
-            )}
-          </MobileMenu>
         </Nav>
       </Header>
+      
+      <div style={{
+        position: 'fixed',
+        top: '100px',
+        left: '0',
+        right: '0',
+        background: 'linear-gradient(180deg, #3e2723 0%, #2e1065 100%)',
+        color: 'white',
+        padding: '30px',
+        zIndex: 9999,
+        display: mobileMenuOpen ? 'flex' : 'none',
+        flexDirection: 'column',
+        gap: '20px',
+        borderBottom: '3px solid #ffd700',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+      }}>
+        <NavLink as={Link} to="/" end onClick={() => setMobileMenuOpen(false)}>{t('home')}</NavLink>
+        <NavLink as={Link} to="/admin-videos" onClick={() => setMobileMenuOpen(false)}>{t('videos')}</NavLink>
+        <NavLink as={Link} to="/shorts" onClick={() => setMobileMenuOpen(false)}>{t('shorts')}</NavLink>
+        <NavLink as={Link} to="/live" onClick={() => setMobileMenuOpen(false)}>{t('live')}</NavLink>
+        <NavLink as={Link} to="/posts" onClick={() => setMobileMenuOpen(false)}>{t('posts')}</NavLink>
+        <NavLink as={Link} to="/about" onClick={() => setMobileMenuOpen(false)}>{t('about')}</NavLink>
+        <NavLink as={Link} to="/contact" onClick={() => setMobileMenuOpen(false)}>{t('contact')}</NavLink>
+        <DonateNavLink as={Link} to="/donate" onClick={() => setMobileMenuOpen(false)}>{t('donate')}</DonateNavLink>
+        {user?.role === 'admin1' && (
+          <NavLink as={Link} to="/admin/pages" onClick={() => setMobileMenuOpen(false)} style={{ color: '#DAA520' }}>📝 Pages</NavLink>
+        )}
+        {user ? (
+          <NavLink onClick={() => { handleLogout(); setMobileMenuOpen(false); }} style={{ cursor: 'pointer' }}>{t('logout')}</NavLink>
+        ) : (
+          <NavLink onClick={() => { setShowLogin(true); setMobileMenuOpen(false); }} style={{ cursor: 'pointer' }}>{t('login')}</NavLink>
+        )}
+      </div>
       
       <main>{children}</main>
       
