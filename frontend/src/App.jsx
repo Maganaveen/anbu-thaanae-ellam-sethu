@@ -35,6 +35,7 @@ function App() {
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/admin/pages" element={<AdminPageManager />} />
             <Route path="/my-uploads" element={<MyUploads />} />
+            <Route path="*" element={<Home />} />
           </Routes>
           <Toaster position="top-right" />
         </div>
