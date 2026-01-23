@@ -19,12 +19,14 @@ const AdminVideos = () => {
 
   const fetchVideos = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/videos?page=${page}&limit=24`);
+      console.log('API_BASE_URL:', API_BASE_URL);
+      console.log('Full URL:', `${API_BASE_URL}/videos?page=${page}&limit=24`);
+      const response = await axios.get(`https://anbu-thaanae-ellam-sethu.onrender.com/api/videos?page=${page}&limit=24`);
       
       setVideos(response.data.videos || []);
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
-      // console.error('Error fetching videos:', error);
+      console.error('Error fetching videos:', error);
     } finally {
       setLoading(false);
     }

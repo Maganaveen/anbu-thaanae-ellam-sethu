@@ -12,7 +12,10 @@ const Donate = () => {
 
   return (
     <Layout>
-      <HeroContainer style={{ minHeight: 'auto', padding: '100px 20px' }}>
+      <HeroContainer style={{ 
+        minHeight: 'auto', 
+        padding: 'clamp(60px, 15vw, 100px) clamp(10px, 5vw, 20px)' 
+      }}>
         <FloatingElements>
           <div className="blob" style={{ width: '400px', height: '400px', top: '-10%', left: '-10%' }} />
           <div className="blob" style={{ width: '300px', height: '300px', bottom: '10%', right: '-5%', background: 'linear-gradient(135deg, rgba(255,100,0,0.1) 0%, rgba(255,200,0,0.1) 100%)' }} />
@@ -28,13 +31,14 @@ const Donate = () => {
               {t('anbu_dhanam')}
             </ModernTitle>
             <p style={{
-              fontSize: '1.4rem',
+              fontSize: 'clamp(1rem, 3vw, 1.4rem)',
               color: '#5d4037',
               maxWidth: '800px',
               margin: '0 auto',
               lineHeight: '1.8',
               fontFamily: "'Crimson Text', serif",
-              fontStyle: 'italic'
+              fontStyle: 'italic',
+              padding: '0 10px'
             }}>
               "{t('donate_desc')}"
             </p>
@@ -42,31 +46,41 @@ const Donate = () => {
 
           <Grid>
             {/* UPI Section */}
-            <GlassCard style={{ padding: '3rem 2rem' }}>
+            <GlassCard style={{ padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem)' }}>
               <h3 style={{ 
                 color: '#3e2723', 
-                fontSize: '2rem', 
+                fontSize: 'clamp(1.4rem, 4vw, 2rem)', 
                 fontFamily: "'Crimson Text', serif",
                 marginBottom: '1.5rem'
               }}>{t('upi_donation')}</h3>
               
               <div style={{
                 background: 'white',
-                padding: '1.5rem',
+                padding: 'clamp(1rem, 3vw, 1.5rem)',
                 borderRadius: '20px',
                 display: 'inline-block',
                 boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
                 border: '1px solid #ffd700',
-                marginBottom: '2rem'
+                marginBottom: '2rem',
+                maxWidth: '100%'
               }}>
                 <img 
                   src="/images/qr-code.jpg" 
                   alt="UPI QR Code" 
-                  style={{ maxWidth: '250px', borderRadius: '10px' }} 
+                  style={{ 
+                    maxWidth: 'min(250px, 80vw)', 
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '10px' 
+                  }} 
                 />
               </div>
 
-              <div style={{ textAlign: 'left', color: '#5d4037', fontSize: '1.1rem' }}>
+              <div style={{ 
+                textAlign: 'left', 
+                color: '#5d4037', 
+                fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)' 
+              }}>
                 <p style={{ marginBottom: '10px' }}>• {t('upi_step1')}</p>
                 <p style={{ marginBottom: '10px' }}>• {t('upi_step2')}</p>
                 <p>• {t('upi_step3')}</p>
@@ -74,17 +88,17 @@ const Donate = () => {
             </GlassCard>
 
             {/* Bank Section */}
-            <GlassCard style={{ padding: '3rem 2rem' }}>
+            <GlassCard style={{ padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem)' }}>
               <h3 style={{ 
                 color: '#3e2723', 
-                fontSize: '2rem', 
+                fontSize: 'clamp(1.4rem, 4vw, 2rem)', 
                 fontFamily: "'Crimson Text', serif",
                 marginBottom: '1.5rem'
               }}>{t('bank_transfer')}</h3>
               
               <div style={{
                 background: 'rgba(62, 39, 35, 0.05)',
-                padding: '2rem',
+                padding: 'clamp(1rem, 4vw, 2rem)',
                 borderRadius: '20px',
                 textAlign: 'left',
                 borderLeft: '5px solid #ffd700',
@@ -92,34 +106,47 @@ const Donate = () => {
               }}>
                 <div style={{ marginBottom: '15px' }}>
                   <strong style={{ color: '#8b4513' }}>{t('bank_name')}:</strong><br />
-                  <span style={{ fontSize: '1.2rem' }}>Indian Bank</span>
+                  <span style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>Indian Bank</span>
                 </div>
                 <div style={{ marginBottom: '15px' }}>
                   <strong style={{ color: '#8b4513' }}>{t('acc_no')}:</strong><br />
-                  <span style={{ fontSize: '1.2rem', letterSpacing: '1px' }}>782454122</span>
+                  <span style={{ 
+                    fontSize: 'clamp(1rem, 3vw, 1.2rem)', 
+                    letterSpacing: '1px',
+                    wordBreak: 'break-all'
+                  }}>782454122</span>
                 </div>
                 <div style={{ marginBottom: '15px' }}>
                   <strong style={{ color: '#8b4513' }}>{t('ifsc')}:</strong><br />
-                  <span style={{ fontSize: '1.2rem', letterSpacing: '1px' }}>IDIB000T095</span>
+                  <span style={{ 
+                    fontSize: 'clamp(1rem, 3vw, 1.2rem)', 
+                    letterSpacing: '1px',
+                    wordBreak: 'break-all'
+                  }}>IDIB000T095</span>
                 </div>
                 <div>
                   <strong style={{ color: '#8b4513' }}>{t('branch')}:</strong><br />
-                  <span style={{ fontSize: '1.2rem' }}>Eswarinagar, Thanjavur</span>
+                  <span style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>Eswarinagar, Thanjavur</span>
                 </div>
               </div>
 
-              <p style={{ color: '#795548', fontStyle: 'italic' }}>
+              <p style={{ 
+                color: '#795548', 
+                fontStyle: 'italic',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1rem)'
+              }}>
                 {t('contact_queries')}: +91 9342732720
               </p>
             </GlassCard>
           </Grid>
 
-          <div style={{ marginTop: '5rem', textAlign: 'center' }}>
+          <div style={{ marginTop: 'clamp(3rem, 8vw, 5rem)', textAlign: 'center' }}>
             <h2 style={{ 
-              fontSize: '2.5rem', 
+              fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', 
               fontFamily: "'Crimson Text', serif", 
               color: '#3e2723',
-              marginBottom: '3rem'
+              marginBottom: 'clamp(2rem, 5vw, 3rem)',
+              padding: '0 10px'
             }}>{t('how_help')}</h2>
             
             <Grid style={{ margin: '0' }}>

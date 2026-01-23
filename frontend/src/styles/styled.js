@@ -206,6 +206,11 @@ export const HeroContainer = styled.div`
   overflow: hidden;
   padding: 40px 20px;
   background: radial-gradient(circle at 50% 50%, #f9e4c8 0%, #f1bc68 100%);
+  
+  @media (max-width: 768px) {
+    padding: 20px 10px;
+    min-height: auto;
+  }
 `;
 
 export const GlassCard = styled.div`
@@ -221,6 +226,12 @@ export const GlassCard = styled.div`
   position: relative;
   z-index: 5;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin: 0 10px;
+  }
 `;
 
 export const ModernTitle = styled.h1`
@@ -453,8 +464,9 @@ export const DonateButton = styled.button`
   }
 `;
 
-export const MobileMenu = styled.div`
-  display: none;
+export const MobileMenu = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isOpen',
+})`
   position: absolute;
   top: 100%;
   left: 0;
@@ -465,10 +477,9 @@ export const MobileMenu = styled.div`
   gap: 20px;
   border-bottom: 3px solid #ffd700;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  z-index: 999;
   
-  @media (max-width: 768px) {
-    display: ${props => props.isOpen ? 'flex' : 'none'};
-  }
+  display: ${props => props.isOpen ? 'flex' : 'none'};
 
   a {
     font-size: 1.2rem;
@@ -541,6 +552,12 @@ export const Grid = styled.div`
   width: 100%;
   max-width: 1100px;
   margin: 3rem auto;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin: 2rem auto;
+  }
 `;
 
 export const InfoCard = styled.div`
@@ -562,6 +579,20 @@ export const InfoCard = styled.div`
     margin-bottom: 1.5rem;
     font-family: 'Crimson Text', serif;
     font-size: 1.8rem;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    border-radius: 20px;
+    
+    h3 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      font-size: 0.9rem;
+    }
   }
 `;
 
